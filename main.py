@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 from Pelicula import *
 from Persona import *
+from Singleton import *
 import requests
 
 pageMain = 'http://www.sensacine.com'
@@ -9,7 +10,8 @@ pageReparto = ''
 
 def webScraping():
     noPages = 1
-    while noPages < 26:
+
+    while noPages < 500:
         if noPages == 1:
             url = 'http://www.sensacine.com/peliculas/mejores/nota-espectadores/'
         else:
@@ -23,6 +25,12 @@ def webScraping():
             break
         noPages += 1
 
+    cadena = Singleton.getInstance().getCadena()
+    with open("peliculas.txt", 'w', encoding='utf-8') as f:
+        #f = open("peliculas.txt", 'w')
+        f.write(cadena)
+        f.close()
+
 def getMovies(soup_):
     values = soup_.find_all('div', class_='data_box')
 
@@ -33,10 +41,12 @@ def getMovies(soup_):
         soup = BeautifulSoup(page.content, 'html.parser')
         getMovie(soup, pelicula)
 
-        print(Pelicula.noPelicula)
-        pelicula.listPersona()
+        pppp = pelicula.toString()
+        print(pppp)
+        Singleton.getInstance().addCadena(pppp)
 
-        Pelicula.noPelicula += 1
+        print(Pelicula.noPelicula)
+
         if Pelicula.noPelicula > 500:
             break
 
@@ -78,49 +88,67 @@ def getMovie(soup_, pelicula):
             else:
                 pelicula.subtitulada = 'no'
 
+    if Pelicula.noPelicula < 250:
+        pelicula.year = '2019'
+    else:
+        pelicula.year = '2020'
+
     pelicula.urlReparto = pelicula.url + 'reparto/'
     page = requests.get(pelicula.urlReparto)
     soup = BeautifulSoup(page.content, 'html.parser')
     getReparto(soup, pelicula)
 
 def getReparto(soup_, pelicula):
-    info = soup_.find('section', class_='section section-wrap gd-2-cols gd-gap-30 row-col-sticky')
-    values = info.find_all('div', class_='gd gd-gap-15 gd-xs-2 gd-s-4')
-    directores = values[0].find_all('div', class_='card person-card person-card-col')
-    actores = values[1].find_all('div', class_='card person-card person-card-col')
+    #section section-wrap gd-2-cols gd-gap-30 row-col-sticky
+    #gd gd-gap-15 gd-xs-2 gd-s-4
+    #card person-card person-card-col
+    try:
+        info = soup_.find('section', class_='section section-wrap gd-2-cols gd-gap-30 row-col-sticky')
+        values = info.find_all('div', class_='gd gd-gap-15 gd-xs-2 gd-s-4')
 
-    values = info.find_all('div', class_='section casting-list')
-    values = values[len(values)-1].find_all('div', class_='gd gd-xs-1 gd-s-2 md-table-row')
-    pelicula.productores = []
-    pelicula.reparto = []
+        directores = values[0].find_all('div', class_='card person-card person-card-col')
+        actores = values[1].find_all('div', class_='card person-card person-card-col')
 
-    for value in values:
-        pelicula.productores.append(value.find_all('span')[1].text)
+        values = info.find_all('div', class_='section casting-list')
+        values = values[len(values) - 1].find_all('div', class_='gd gd-xs-1 gd-s-2 md-table-row')
 
-    for director in directores:
-        persona = Persona()
-        persona.nombre = director.find('a', class_='meta-title-link').text
-        persona.rol = 'director'
+        pelicula.productores = []
+        pelicula.reparto = []
 
-    for actor in actores:
-        value = actor.find('a', class_='meta-title-link')
-        correcto1 = False
-        correcto2 = False
+        for value in values:
+            pelicula.productores.append(value.find_all('span')[1].text)
 
-        if value != None:
-            nombre = value.text
-            correcto1 = True
-
-        value = actor.find('div', class_='meta-sub light')
-        if value != None:
-            personaje = value.text.split(':')[1]
-            correcto2 = True
-
-        if correcto1 and correcto2:
+        for director in directores:
             persona = Persona()
-            persona.nombre = nombre
-            persona.personaje = personaje
+            persona.nombre = director.find('a', class_='meta-title-link').text
+            persona.rol = 'director'
             pelicula.reparto.append(persona)
+
+        for actor in actores:
+            value = actor.find('a', class_='meta-title-link')
+            correcto1 = False
+            correcto2 = False
+
+            if value != None:
+                nombre = value.text
+                correcto1 = True
+
+            value = actor.find('div', class_='meta-sub light')
+            if value != None:
+                personaje = value.text.split(':')[1]
+                correcto2 = True
+
+            if correcto1 and correcto2:
+                persona = Persona()
+                persona.nombre = nombre
+                persona.rol = 'actor'
+                persona.personaje = personaje
+                pelicula.reparto.append(persona)
+
+        Pelicula.noPelicula += 1
+
+    except:
+        print('error en una pelicula')
 
 if __name__ == '__main__':
     webScraping()
