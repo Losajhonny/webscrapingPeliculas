@@ -99,7 +99,13 @@ class Pelicula:
 
     def getActores(self):
         cad = ''
+        cont = 0
+        size = len(self.reparto)
         for actor in self.reparto:
-            cad += '\t\t' + actor.toString() + '\n'
+            if cont == size - 1:
+                cad += '\t\t' + actor.toString() + '\n'
+            else:
+                cad += '\t\t' + actor.toString() + ',\n'
+            cont += 1
         return '"actores": [\n' + cad + '\t]'
 
