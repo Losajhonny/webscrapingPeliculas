@@ -24,7 +24,8 @@ class Pelicula:
         self.idPelicula = id
 
     def toString(self):
-        cad = 'db.pelicula.insert({\n'
+        #cad = 'db.pelicula.insert({\n'
+        cad = "{\n"
         cad += '\t' + self.getNombre() + ',\n'
         cad += '\t' + self.getFecha() + ',\n'
         cad += '\t' + self.getClasificacion() + ',\n'
@@ -36,18 +37,19 @@ class Pelicula:
         cad += '\t' + self.getYear() + ',\n'
         cad += '\t' + self.getResumen() + ',\n'
         cad += '\t' + self.getActores() + '\n'
-        cad += '});'
+        cad += "},\n";
+        #cad += '});'
         #print(cad)
         return cad
 
     def getNombre(self):
-        return '"nombre": "' + self.nombre.strip() + '"'
+        return '"nombre": "' + self.nombre.strip().replace('\"', '') + '"'
 
     def getFecha(self):
-        return '"fecha": "' + self.fecha.strip() + '"'
+        return '"fecha": "' + self.fecha.strip().replace('\"', '') + '"'
 
     def getClasificacion(self):
-        return '"clasificacion": "' + self.clasificacion.strip() + '"'
+        return '"clasificacion": "' + self.clasificacion.strip().replace('\"', '') + '"'
 
     def getGenero(self):
         cad = ''
@@ -55,9 +57,9 @@ class Pelicula:
         size = len(self.generos)
         for item in self.generos:
             if cont == size-1:
-                cad += '"' + item.strip() + '"'
+                cad += '"' + item.strip().replace('\"', '') + '"'
             else:
-                cad += '"' + item.strip() + '", '
+                cad += '"' + item.strip().replace('\"', '') + '", '
             cont += 1
         return '"genero": [' + cad + ']'
 
@@ -67,9 +69,9 @@ class Pelicula:
         size = len(self.productores)
         for item in self.productores:
             if cont == size - 1:
-                cad += '"' + item.strip() + '"'
+                cad += '"' + item.strip().replace('\"', '') + '"'
             else:
-                cad += '"' + item.strip() + '", '
+                cad += '"' + item.strip().replace('\"', '') + '", '
             cont += 1
         return '"casa_productora": [' + cad + ']'
 
@@ -79,23 +81,24 @@ class Pelicula:
         size = len(self.idioma)
         for item in self.idioma:
             if cont == size - 1:
-                cad += '"' + item.strip() + '"'
+                cad += '"' + item.strip().replace('\"', '') + '"'
             else:
-                cad += '"' + item.strip() + '", '
+                cad += '"' + item.strip().replace('\"', '') + '", '
             cont += 1
         return '"idioma": [' + cad + ']'
 
     def getSubitulada(self):
-        return '"subtitulada": "' + self.subtitulada.strip() + '"'
+        return '"subtitulada": "' + self.subtitulada.strip().replace('\"', '') + '"'
 
     def getDuracion(self):
-        return '"duracion": "' + self.duracion.strip() + '"'
+        return '"duracion": "' + self.duracion.strip().replace('\"', '') + '"'
 
     def getYear(self):
-        return '"anio_produccion": ' + self.year.strip()
+        return '"anio_produccion": ' + self.year.strip().replace('\"', '')
 
     def getResumen(self):
-        return '"resumen": "' + self.resumen.strip().replace('\n', '') + '"'
+        #return '"resumen": "' + self.resumen.strip().replace('\n', '') + '"'
+        return '"resumen": "pelicula chilera"'
 
     def getActores(self):
         cad = ''

@@ -26,7 +26,8 @@ def webScraping():
         noPages += 1
 
     cadena = Singleton.getInstance().getCadena()
-    with open("peliculas.txt", 'w', encoding='utf-8') as f:
+    cadena = "db.pelicula.insertMany([\n" + cadena + "]);"
+    with open("peliculas.js", 'w', encoding='utf-8') as f:
         #f = open("peliculas.txt", 'w')
         f.write(cadena)
         f.close()
